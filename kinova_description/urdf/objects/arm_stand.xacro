@@ -1,5 +1,3 @@
- <!-- All code for the table is taking from https://github.com/JenniferBuehler/jaco-arm-pkgs -->
-
 <?xml version="1.0" encoding="UTF-8"?>
 <root xmlns:xacro="http://ros.org/wiki/xacro">
 

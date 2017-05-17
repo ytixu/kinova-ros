@@ -1,14 +1,12 @@
- <!-- All code for the table is taking from https://github.com/JenniferBuehler/jaco-arm-pkgs -->
-
 <?xml version="1.0" encoding="UTF-8"?>
 <root xmlns:xacro="http://ros.org/wiki/xacro">
 
     <xacro:macro name="default_material">
-	<mu1>0.9</mu1>
-	<mu2>0.9</mu2>
-    	<kp>1000000.0</kp>
-    	<kd>1.0</kd>
-	<dynamics damping="0.7" friction="100.0" />
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+        <kp>1000000.0</kp>
+        <kd>1.0</kd>
+    <dynamics damping="0.7" friction="100.0" />
     </xacro:macro>
 
 

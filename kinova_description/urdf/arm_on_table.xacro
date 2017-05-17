@@ -60,4 +60,27 @@
 		<child link="root"/>
 	</joint>
 
+	<!-- Add the Xtion to the table to observe the real arm: code from here https://github.com/JenniferBuehler/common-sensors.git
+
+	<joint name="toxtion_base" type="fixed">
+        <origin xyz="0 0 0.1" rpy="0 0 -1.57079632679" />
+        <parent link="j2n6s300_link_6" />
+        <child link="xtion_base" />
+    </joint>
+
+    <link name="xtion_base">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0 0 0"/>
+            </geometry>
+            <material name="orange"/>
+        </visual>
+    </link>
+
+    <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
+    <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
+		<origin xyz="0 0 0" rpy="0 0 0" />
+	</xacro:sensor_xtion>  -->
+
 </robot>

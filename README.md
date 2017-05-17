@@ -1,3 +1,22 @@
+# JACO ON TABLE
+
+Added table + Kinect sensor in the simulation:
+- Code for the URDF and meshes were taking from https://github.com/JenniferBuehler/jaco-arm-pkgs/tree/master/jaco_tutorial/jaco_on_table
+- Dependency for adding Kinect sensor: https://github.com/JenniferBuehler/common-sensors
+
+### To Run
+
+```
+roslaunch kinova_gazebo robot_table.launch
+roslaunch j2n6s300_moveit_config j2n6s300_gazebo_demo.launch
+```
+
+### For cartesian planning
+
+You can use https://github.com/ros-industrial-consortium/fermi
+
+(Below is the same from the Kinova README file.)
+
 # IMPORTANT
 
 kinova-driver release 1.2.0.
@@ -11,14 +30,14 @@ The previous ROS release, which mainly developed for jaco arm will be named as "
 A few bug fix:
 specific to 7 dof robot:
 - PID controller parameters for the 7 dof robot with spherical wrist (before, the Gazebo model was unstable when launched)
-- addition of a is7dof argument in kinova_gazebo/launch/robot_launch.launch and kinova_control/launch/kinova_control.launch to load joint_7_position_controller in addition to other position_controllers when launching the gazebo model with use_trajectory_controller set to false and a 7 dof robot. This argument has to be set to true for a 7 dof robot. 
+- addition of a is7dof argument in kinova_gazebo/launch/robot_launch.launch and kinova_control/launch/kinova_control.launch to load joint_7_position_controller in addition to other position_controllers when launching the gazebo model with use_trajectory_controller set to false and a 7 dof robot. This argument has to be set to true for a 7 dof robot.
 - correction in kinova_control/launch/j2s7s300.perspective (rqt tool was publishing to wrong topic)
 specific to MICO robot:
 - correction in kinova_control/launch/m1n6s200.perspective (rqt tool was publishing to wrong topic)
 for all robots:
 - fix in home_arm service (before, was not working when robot was connected through Ethernet)
 - commented out the COM parameters all set to zero in kinova_bringup/launch/config/robot_parameters.yaml, or else the robot does not compensate gravity accurately when switched to admittance or torque mode. These COM parameters can be commented out if the user wants to change the default COM parameters, but by default, we take for granted that the user wants to use the parameters already implemented in the robot.
-- change the order conditions are checked in the kinova_joint_angles_action.cpp, kinova_tool_pose_action.cpp and kinova_fingers_action.cpp to insure that the robot does not accept new goals after having been stopped (emergency stop). See issue #92 for more details. 
+- change the order conditions are checked in the kinova_joint_angles_action.cpp, kinova_tool_pose_action.cpp and kinova_fingers_action.cpp to insure that the robot does not accept new goals after having been stopped (emergency stop). See issue #92 for more details.
 
 ### new in release 1.2.0
 
@@ -46,14 +65,14 @@ for all robots:
 
 # KINOVA-ROS
 
-The `kinova-ros` stack provides a ROS interface for the Kinova Robotics JACO, JACO2 and MICO robotic manipulator arms, and it is built to support further kinova products as well. Besides  widely support of Kinova products, there are many bug fixing, improvements and new features as well. The stack is developped upon the Kinova C++ API functions, which communicates with the DSP inside robot base. 
+The `kinova-ros` stack provides a ROS interface for the Kinova Robotics JACO, JACO2 and MICO robotic manipulator arms, and it is built to support further kinova products as well. Besides  widely support of Kinova products, there are many bug fixing, improvements and new features as well. The stack is developped upon the Kinova C++ API functions, which communicates with the DSP inside robot base.
 
 ## Supported versions
 The recommended configuration is ROS Indigo with 64 bit Ubuntu 14.04.
 
-The package may work with other configurations as well, but it has only been tested for the one recommended above. 
+The package may work with other configurations as well, but it has only been tested for the one recommended above.
 
-## Gazebo 
+## Gazebo
 #### new in release 1.2.0
 The wiki page for Gazebo is available [here] (https://github.com/Kinovarobotics/kinova-ros/wiki/Gazebo)
 
@@ -63,9 +82,9 @@ The wiki page for MoveIt! is available [here](https://github.com/Kinovarobotics/
 
 ## file system
  - kinova_bringup: launch file to start kinova_driver and apply some configurations
- - kinova_driver: most essential files to run kinova-ros stack. Under the include folder, Kinova C++ API headers are defined in ../indlude/kinova, and ROS package header files are in kinova_driver folder. kinova_api source file is a wrap of Kinova C++ API, and kinova_comm builds up the fundamental functions. Some advanced accesses regarding to force/torque control are only provided in kinova_api.  Most parameters and topics are created in kinova_arm. A generous archeteture from low level up could be: 
-    DSP --communicate--> Kinova C++ API --wrapped--> kinova_api --> kinova_comm 
-    --> {kinova_arm; kinova_fingers_action; kinova_joint_angles_action; ...} --> kinova_arm_driver. **It is not recommaned to modify kinova_comm and any level below.** 
+ - kinova_driver: most essential files to run kinova-ros stack. Under the include folder, Kinova C++ API headers are defined in ../indlude/kinova, and ROS package header files are in kinova_driver folder. kinova_api source file is a wrap of Kinova C++ API, and kinova_comm builds up the fundamental functions. Some advanced accesses regarding to force/torque control are only provided in kinova_api.  Most parameters and topics are created in kinova_arm. A generous archeteture from low level up could be:
+    DSP --communicate--> Kinova C++ API --wrapped--> kinova_api --> kinova_comm
+    --> {kinova_arm; kinova_fingers_action; kinova_joint_angles_action; ...} --> kinova_arm_driver. **It is not recommaned to modify kinova_comm and any level below.**
 
  - kinova_demo: python scripts for actionlibs in joint space and cartesian space.
  - kinova_msgs: all the messages, servers and actionlib format are defined here.
@@ -101,8 +120,8 @@ For Jaco 1 and 2 use the tag 'j2' for both.
 **kinova_robotName** and **kinova_robotSerial**
 #### new in release 1.2.0
 To allow multiple robots under a ros master, kinova_robotName and kinova_robotSerial was added.
-For applications like **moveIt!** set kinova_robotName to your prefix for the robot in the URDF. 
-For example you can launch two jaco robots by using the following - 
+For applications like **moveIt!** set kinova_robotName to your prefix for the robot in the URDF.
+For example you can launch two jaco robots by using the following -
 
 '''
 roslaunch kinova_bringup kinova_robot.launch kinova_robotType:=j2n6s300 kinova_robotName:=left kinova_robotSerial:=PJ00000001030703130
@@ -113,13 +132,13 @@ These parameters are optional and can be dropped off when only one robot is conn
 
 **use_urdf** specifies whether the kinematic solution is provided by the URDF model. THis is recommended and the default option.
 
-When `use_urdf:=true` (default value), the kinematic solution is automatically solved by URDF model. 
-The robot can be virtually presented in the Rviz and the frames in Rviz are located at each joints. 
-To visulize the robot in Rviz, run `$ rosrun rviz rviz`, and select *root* as the world frame. 
+When `use_urdf:=true` (default value), the kinematic solution is automatically solved by URDF model.
+The robot can be virtually presented in the Rviz and the frames in Rviz are located at each joints.
+To visulize the robot in Rviz, run `$ rosrun rviz rviz`, and select *root* as the world frame.
 The robot model will synchronize the motion with the real robot.
 
-If `use_urdf:=false`, the kinematic solution is as ame as the DSP code inside robot. 
-Node `kinova_tf_updater` will be activated to publish frames, and the frames are defined 
+If `use_urdf:=false`, the kinematic solution is as ame as the DSP code inside robot.
+Node `kinova_tf_updater` will be activated to publish frames, and the frames are defined
 according the classic D-H converntion(frame may not locat at joints). Even you are not able to visulize
 the robot properly in Rviz, you are able to observe the D-H frames in Rviz.
 
@@ -133,7 +152,7 @@ Joint position control can be realized by calling KinovaComm::setJointAngles() i
 *eg*: `rosrun kinova_demo joints_action_client.py -v -r m1n4s200 degree -- 0 0 0 10`
 
 Joint position can be observed by echoing two topics:
-`/'${kinova_robotType}_driver'/out/joint_angles` (in degree) and 
+`/'${kinova_robotType}_driver'/out/joint_angles` (in degree) and
 `/'${kinova_robotType}_driver'/out/state/position` (in radians including finger information)
 
  *eg*: `rostopic echo -c /m1n4s200_driver/out/joint_state` will print out joint names, velocity and effort information. However, the effort is a place holder for further verstion.
@@ -153,7 +172,7 @@ Cartesian position control can be realized by calling KinovaComm::setCartesianPo
 *eg*: `rosrun kinova_demo pose_action_client.py -v -r m1n4s200 mdeg -- 0.01 0 0 0 10 10`
 
 The Cartesian coordinate of robot root frame is defined by the following rules:
-- origin is the intersection point of the bottom plane of the base and cylinder center line.    
+- origin is the intersection point of the bottom plane of the base and cylinder center line.
 - +x axis is directing to the left when facing the base panel (where power switch and cable socket locate).
 - +y axis is towards to user when facing the base panel.
 - +z axis is upwards when robot is standing on a flat surface.
@@ -170,8 +189,8 @@ In addition, the wrench of end-effector is published via topic: `/'${kinova_robo
   - Now a cubic with 3 axis (translation) and 3 rings(rotation) should appear at the end-effector, and you can move the robot by drag the axis or rings.
 
 #### new in release 1.2.0
-Executing multiple Cartesian waypoints without stopping  
-The action client executes one goal at a time. In case user wants to give multiple waypoints to the robot without stopping at every waypoint, the service *AddPoseToCartesianTrajectories* can be used. 
+Executing multiple Cartesian waypoints without stopping
+The action client executes one goal at a time. In case user wants to give multiple waypoints to the robot without stopping at every waypoint, the service *AddPoseToCartesianTrajectories* can be used.
 This service adds the commanded poses to a buffer that that maintained by the robot. Robot executes the poses in this buffer in order that they are added, without stopping between poses.
 
 The service *ClearTrajectories* can be used to clear the trajectory buffer in the base.
@@ -186,7 +205,7 @@ The finger position is published via topic: `/'${kinova_robotType}_driver'/out/f
 ### Velocity Control (joint space and Cartesian space)
 The user have access to both joint velocity and Cartesian velocity (linear velocity and angular velocity). The joint velocity control can be realized by publishing to topic  `/'${kinova_robotType}_driver'/in/joint_velocity`. The following command can move the 4th joint of a mico robot at a rate of approximate 10 degree/second. Please be aware that the publishing rate **dose** effect the motion speed much.
 
-*eg*: `rostopic pub -r 100 /m1n4s200_driver/in/joint_velocity kinova_msgs/JointVelocity "{joint1: 0.0, joint2: 0.0, joint3: 0.0, joint4: 10.0}" ` 
+*eg*: `rostopic pub -r 100 /m1n4s200_driver/in/joint_velocity kinova_msgs/JointVelocity "{joint1: 0.0, joint2: 0.0, joint3: 0.0, joint4: 10.0}" `
 
 For Cartesian linear velocity, the unit is meter/second. Definition of angular velocity "Omega" is based on the skew-symmetric matrices "S = R*R^(-1)", where "R" is the rotation matrix. angular velocity vector "Omega = [S(3,2); S(1,3); S(2,1)]". The unit is radian/second.  An example is given below:
 
@@ -203,23 +222,23 @@ Therefore, the publishing rate at 100Hz is not an optional argument, but a requi
 User can home the robot by the command below. It takes no argument and bring robot to pre-defined home position. The command support customized home position that user defined by SDK or JacoSoft as well.
 `/'${kinova_robotType}_driver'/in/home_arm`
 
-User can also enable and disable the ROS motion command via rosservice 
+User can also enable and disable the ROS motion command via rosservice
 `/'${kinova_robotType}_driver'/in/start`
 and `/'${kinova_robotType}_driver'/in/stop`. When `stop` is called, robot command from ROS will not able to drive robot until `start` is called. However, joystick still has the control during this phase.
 
-### Cartesian Admittance mode (User can control the robot by manually guiding it by hand) 
-The admittance force control can be actived by command 
+### Cartesian Admittance mode (User can control the robot by manually guiding it by hand)
+The admittance force control can be actived by command
 `rosservice call /'${kinova_robotType}_driver'/in/start_force_control` and disabled by `rosservice call /'${kinova_robotType}_driver'/in/stop_force_control`. The user is able to move the robot by appling force/torque to the end-effector/joints. When there is a Cartesian/joint position command, the result motion will be a combination of both force and position command.
 
 #### Re-calibrate torque sensors
 
 ##### new in release 1.2.0
-Over time it is possible that the torque sensors develop offsets in reporting absolute torque. For this they need to be re-calibrated. The calibration process is very simple -   
-1. Move the robot to candle like pose (all joints 180 deg, robot links points straight up), this configuration ensures zero torques at joints.  
+Over time it is possible that the torque sensors develop offsets in reporting absolute torque. For this they need to be re-calibrated. The calibration process is very simple -
+1. Move the robot to candle like pose (all joints 180 deg, robot links points straight up), this configuration ensures zero torques at joints.
 2. Call the service 'rosservice call /'${kinova_robotType}_driver'/in/set_zero_torques'
 
 ### Support for 7 dof spherical wrist robot
-#### new in release 1.2.0 
+#### new in release 1.2.0
 Support for the 7 dof robot has been added in this new release. All of the previous control methods can be used on a 7 dof Kinova robot.
 
 ##### Inverse Kinematics for 7 dof robot
@@ -228,27 +247,27 @@ The inverse kinematics of the 7 dof robot results infinite possible solutions fo
 ##### Move robot in Null space
 To see the full set of solutions, a new fuction is introduced in KinovaAPI - StartRedundantJointNullSpaceMotion(). When in this mode the Kinova joystick can be used to move the robot in null space while keeping the end-effector maintaining its pose.
 
-The mode can be activated by calling the service SetNullSpaceModeState - ${kinova_robotType}_driver'/in/set_null_space_mode_state. 
+The mode can be activated by calling the service SetNullSpaceModeState - ${kinova_robotType}_driver'/in/set_null_space_mode_state.
 Pass 1 to service to enable and 0 to disable.
 
-### Torque control 
-#### new in release 1.2.0 
+### Torque control
+#### new in release 1.2.0
 Torque control has been made more accessible. Now you can publish torque/force commands just like joint/cartesian velocity. To do this you need to :
 
-1. Optional - Set torque parameters  
-Usually default parameters should work for most applications. But if you need to change some torque parameters, you can set parameters (listed at the end of page) and then call the service -   
+1. Optional - Set torque parameters
+Usually default parameters should work for most applications. But if you need to change some torque parameters, you can set parameters (listed at the end of page) and then call the service -
 SetTorqueControlParameters '${kinova_robotType}_driver/in/set_torque_control_parameters'
 
-2. Switch to torque control from position control  
+2. Switch to torque control from position control
 You can do this using the service  - SetTorqueControlMode '${kinova_robotType}_driver'/in/set_torque_control_mode'
 
 3. Publish torque commands rostopic pub -r 100 /j2n6s300_driver/in/joint_torque kinova_msgs/JointTorque "{joint1: 0.0, joint2: 0.0, joint3: 0.0, joint4: 0.0, joint5: 0.0, joint6: 1.0}"
 
 #### Gravity compensation
-Gravity compensation is done by default in the robot's base. This means that if the robot is commanded zero torques the robot does not fall under gravity. This case (zero commanded torque) 
+Gravity compensation is done by default in the robot's base. This means that if the robot is commanded zero torques the robot does not fall under gravity. This case (zero commanded torque)
 can be refered to as 'gravity compensated mode', the robot can me moved around freely by manually pushing its joints. You can try out this mode by using the command (for a j2s7300)
 
-rosrun kinova_demo gravity_compensated_mode.py j2s7300 
+rosrun kinova_demo gravity_compensated_mode.py j2s7300
 
 This command moves the robot to candle-like pose, sets torques to zero, and then starts torque control mode. It publishes torque commands as [0,0,0,0,0,0], so the robot can be moved by pushing on individual joints.
 
@@ -263,47 +282,47 @@ mode (1): The torque commands will be set to zero. By default, option (1) is set
 (Jaco2 and Mico) while option (0) is set for generic mode.
 
 ## Ethernet connection
-#### new in release 1.2.0 
+#### new in release 1.2.0
 **Note** - Although this release supports Ethernet connection, this feature is only limited to test clients.
-Kinova will notify all users when Ethernet support released for all customers. 
+Kinova will notify all users when Ethernet support released for all customers.
 
-Support for Ethernet connection has been added. All functionalities available in USB are available in Ethernet. 
+Support for Ethernet connection has been added. All functionalities available in USB are available in Ethernet.
 To use ethernet follow these steps
 1. Setup a static IP address for your ethernet network say - 192.168.100.100
 2. With the robot connected to your PC via USB open kinova's Develepment Center
-3. Open tab General/Ethernet - Set robot IP Address to something like - 192.168.100.xxx 
+3. Open tab General/Ethernet - Set robot IP Address to something like - 192.168.100.xxx
 4. Make sure MAC address is not all zero. If so contact support@kinova.ca
 5. Press 'Update' and restart robot
 6. In a terminal ping your robot's IP, your robot is setup for ethernet
 
-To connect to robot via ethernet in ROS just set these parameters in robot_parameters.yaml - 
+To connect to robot via ethernet in ROS just set these parameters in robot_parameters.yaml -
 
-connection_type: ethernet  
-local_machine_IP: [your PC network IP]  
-subnet_mask: [your network subnet mask]  
+connection_type: ethernet
+local_machine_IP: [your PC network IP]
+subnet_mask: [your network subnet mask]
 
 
 
 ## Parameters
-#### new in release 1.2.0 
+#### new in release 1.2.0
 ##### General parameters
-* serial_number: PJ00000001030703130  
-  leave commented out if you want to control the first robot found connected.  
-* jointSpeedLimitParameter1: 10  
+* serial_number: PJ00000001030703130
+  leave commented out if you want to control the first robot found connected.
+* jointSpeedLimitParameter1: 10
   Joint speed limit for joints 1, 2, 3 in deg/s
-* jointSpeedLimitParameter2: 20  
+* jointSpeedLimitParameter2: 20
   Joint speed limit for joints 4, 5, 6 in deg/s
-* payload: [0, 0, 0, 0]  
-  payload: [COM COMx COMy COMz] in [kg m m m]  
-* connection_type: USB  
+* payload: [0, 0, 0, 0]
+  payload: [COM COMx COMy COMz] in [kg m m m]
+* connection_type: USB
   ethernet or USB
 ##### Ethernet connection parameters
 ethernet:
 
-* local_machine_IP: 192.168.100.21,  
-* subnet_mask: 255.255.255.0,  
-* local_cmd_port: 25000,  
-* local_broadcast_port: 25025  
+* local_machine_IP: 192.168.100.21,
+* subnet_mask: 255.255.255.0,
+* local_cmd_port: 25000,
+* local_broadcast_port: 25025
 
 
 ##### Torque control parameters
@@ -312,18 +331,18 @@ Comment these out to use default values.
 torque_parameters:
 
 * publish_torque_with_gravity_compensation: false
-* torque_min: [1, 0, 0, 0, 0, 0, 0]  
-* torque_max: [50, 0, 0, 0, 0, 0, 0]  
-  If one torque min/max value is sepecified, all min/max values need to be specified  
-* safety_factor: 1  
-  Decides velocity threshold at which robot switches torque to position control (between 0 and 1)  
-* com_parameters: [0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0,0]  
+* torque_min: [1, 0, 0, 0, 0, 0, 0]
+* torque_max: [50, 0, 0, 0, 0, 0, 0]
+  If one torque min/max value is sepecified, all min/max values need to be specified
+* safety_factor: 1
+  Decides velocity threshold at which robot switches torque to position control (between 0 and 1)
+* com_parameters: [0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0,0]
   COM parameters, order [m1,m2,...,m7,x1,x2,...,x7,y1,y2,...y7,z1,z2,...z7]
-  
+
 
 ## GUI for robot status - rqt
 ROS provides a flexible GUI tool to interact with nodes/robots - **rqt**. You can use this
-tool to see topics published by the node - robot position, velocity, torque, etc. 
+tool to see topics published by the node - robot position, velocity, torque, etc.
 You can also launch services like AddPoseToCartesianTrajectory.
 
 Monitoring topics
@@ -334,7 +353,7 @@ Monitoring topics
 
 Other plugins in rqt can similarly be used for quick interation with the robot.
 
-## What's new in this release 
+## What's new in this release
 ### new in release 1.2.0
 
 - MoveIt! support
@@ -382,7 +401,7 @@ Other plugins in rqt can similarly be used for quick interation with the robot.
 
 2. The ``joint_state`` topic currently reports only the arm position and
 velocity. Effort is a placeholder for future compatibility. Depending on your
-firmware version velocity values can be wrong. 
+firmware version velocity values can be wrong.
 
 3. When updating the firmware on the arm (e.g., using Jacosoft) the serial number will be set to "Not set" which will cause multiple arms to be unusable. The solution is to make sure that the serial number is reset after updating the arm firmware.
 
