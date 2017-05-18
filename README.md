@@ -4,10 +4,15 @@ Added table + Kinect sensor in the simulation:
 - Code for the URDF and meshes were taking from https://github.com/JenniferBuehler/jaco-arm-pkgs/tree/master/jaco_tutorial/jaco_on_table
 - Dependency for adding Kinect sensor: https://github.com/JenniferBuehler/common-sensors
 
-### To Run
+### To Run Gazebo and Moveit
 
 ```
 roslaunch kinova_gazebo robot_table.launch
+```
+
+The simulation is paused at launch time. Unpause it, wait until the arm goes to home pause and then you can launch Moveit.
+
+```
 roslaunch j2n6s300_moveit_config j2n6s300_gazebo_demo.launch
 ```
 

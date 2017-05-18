@@ -23,7 +23,8 @@
             <collision>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://kinova_description/meshes/objects/arm_stand.STL" />
+                    <box size = "0 0 0"/>
+                    <!-- <mesh filename="package://kinova_description/meshes/objects/arm_stand.STL" /> -->
                 </geometry>
             </collision>
         </link>

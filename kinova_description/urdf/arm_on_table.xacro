@@ -48,39 +48,36 @@
 		</collision>
 	</link>
 
-	<property name="robot_root" value="root" />
-
-	<xacro:include filename="$(find kinova_description)/urdf/j2n6s300.xacro"/>
-
-	<xacro:j2n6s300 base_parent="${robot_root}"/>
-
 	<joint name="jaco_to_table" type="fixed">
 		<origin xyz="-0.000482247085224208 0.08 -0.000503436190578577" rpy="1.57079632679 0 3.14159265359" />
 		<parent link="arm_stand"/>
 		<child link="root"/>
 	</joint>
 
-	<!-- Add the Xtion to the table to observe the real arm: code from here https://github.com/JenniferBuehler/common-sensors.git
+	<!-- Add robot arm -->
+
+	<property name="robot_root" value="root" />
+
+	<xacro:include filename="$(find kinova_description)/urdf/j2n6s300.xacro"/>
+
+	<xacro:j2n6s300 base_parent="${robot_root}"/>
+
+	<!-- Add the Xtion to the table to observe the real arm: code from here https://github.com/JenniferBuehler/common-sensors.git -->
 
 	<joint name="toxtion_base" type="fixed">
-        <origin xyz="0 0 0.1" rpy="0 0 -1.57079632679" />
-        <parent link="j2n6s300_link_6" />
+        <origin xyz="0 -0.89 -0.01" rpy="0 0 0" />
+        <parent link="tabletop_corner" />
         <child link="xtion_base" />
     </joint>
 
     <link name="xtion_base">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0 0 0"/>
-            </geometry>
-            <material name="orange"/>
-        </visual>
+        <static>false</static>
     </link>
 
     <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
     <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
-		<origin xyz="0 0 0" rpy="0 0 0" />
-	</xacro:sensor_xtion>  -->
+		<origin xyz="0 0 1" rpy="0 -1.57079632679 -1.57079632679" />
+	</xacro:sensor_xtion>
+
 
 </robot>
