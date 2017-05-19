@@ -10,17 +10,28 @@ Added table + Kinect sensor in the simulation:
 roslaunch kinova_gazebo robot_table.launch
 ```
 
-The simulation is paused at launch time. Unpause it, wait until the arm goes to home pause and then you can launch Moveit.
+The simulation is paused at launch time. Unpause it, wait until the arm pauses. Then you can launch Moveit.
 
 ```
 roslaunch j2n6s300_moveit_config j2n6s300_gazebo_demo.launch
 ```
+
+Then the robot may not be in its home position. You can run
+
+```
+rosrun kinova_control move_robot.py j2n6s300
+```
+or use the Moveit to set the goal to the home position.
 
 ### For cartesian planning
 
 You can use https://github.com/ros-industrial-consortium/fermi
 
 (Below is the same from the Kinova README file.)
+
+### Adding Xtion
+
+Xtion sensor can be added to the simulation by uncommenting the section at the send of `kinova_description/urdf/arm_to_table.xacro` file.
 
 # IMPORTANT
 
