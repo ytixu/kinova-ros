@@ -27,11 +27,12 @@ or use the Moveit to set the goal to the home position.
 
 You can use https://github.com/ros-industrial-consortium/fermi
 
-(Below is the same from the Kinova README file.)
 
 ### Adding Xtion
 
 Xtion sensor can be added to the simulation by uncommenting the section at the send of `kinova_description/urdf/arm_to_table.xacro` file.
+
+(Below is the same from the Kinova README file.)
 
 # IMPORTANT
 

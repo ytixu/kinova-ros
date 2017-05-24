@@ -7,9 +7,9 @@ import rospy
 from robot_control_modules import *
 
 '''
-rosservice call 'j2s6s300_driver'/in/home_arm
-rosservice call 'j2s6s300_driver'/in/start
-rosservice call 'j2s6s300_driver'/in/stop
+rosservice call /j2s6s300_driver/in/home_arm
+rosservice call /j2s6s300_driver/in/start
+rosservice call /j2s6s300_driver/in/stop
 '''
 
 prefix = 'j2s7s300_'
