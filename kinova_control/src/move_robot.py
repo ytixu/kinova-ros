@@ -74,7 +74,8 @@ if __name__ == '__main__':
 
     if (nbJoints==6):
       #home robots
-      moveJoint ([0.0,2.9,1.3,4.2,1.4,0.0],prefix,nbJoints)
+      #[0.0,2.9,1.3,4.2,1.4,0.0]
+      moveJoint ([0.0,2.9,1.0,4.2,1.5,1.3],prefix,nbJoints)
     else:
       moveJoint ([0.0,2.9,0.0,1.3,4.2,1.4,0.0],prefix,nbJoints)
 

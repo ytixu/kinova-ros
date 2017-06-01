@@ -31,19 +31,23 @@ if __name__ == '__main__':
     nbfingers = 3
 
     # go to home position first
-    moveJoint ([0.0,2.9,1.3,4.2,1.4,0.0],prefix,nbJoints)
+    moveJoint ([0.0,2.9,1.0,4.2,1.5,1.3],prefix,nbJoints)
     moveFingers ([1,1,1],prefix,nbfingers)
 
     # TEST HERE
 
     print 'Test all joints.'
 
-    for test in joint_tests:
+    raw_input("Press Enter to continue...")
+    moveJoint ([0.0,2.9,1.3,4.2,1.4,0.0],prefix,nbJoints,[0,0,0,0,0,0.2])
+
+
+    # for test in joint_tests:
       raw_input("Press Enter to continue...")
       moveJoint (test,prefix,nbJoints)
 
     print 'Test fingers.'
-    for test in finger_tests:
+    # for test in finger_tests:
       raw_input("Press Enter to continue...")
       moveFingers (test,prefix,nbfingers)
 
