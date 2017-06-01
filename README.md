@@ -1,7 +1,6 @@
 # JACO ON TABLE
 
 ## Milestone 1: Simulator
--------------------------
 
 Added table + Kinect sensor in the simulation:
 
@@ -38,7 +37,6 @@ Xtion sensor can be added to the simulation by uncommenting the section at the s
 
 
 ## Milestone 2: Camera Calibration
-----------------------------------
 
 ### Requirements
 
@@ -77,6 +75,7 @@ Dependency for ar_tools.
 http://wiki.ros.org/camera_calibration
 
 For internal calibration of the camera. It has name conflict with image_proc, so we can use it independently from the workspace with ar_tools to get up the camera info.
+
 ---
 
 See original readme file from the Kinova repo in `README_original.md`.
