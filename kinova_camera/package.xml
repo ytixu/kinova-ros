@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <name>kinova_camera</name>
+  <version>0.0.0</version>
+  <description>The kinova_camera package</description>
+
+  <maintainer email="maybe@your.email">Buddha</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">https://github.com/ytixu/kinova-ros</url>
+  <url type="repository">https://github.com/ytixu/kinova-ros</url>
+
+  <author email="maybe@your.email">Buddha</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>controller_manager</run_depend>
+  <run_depend>joint_state_controller</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>effort_controllers</run_depend>
+
+
+  <export>
+  </export>
+
+</package>
