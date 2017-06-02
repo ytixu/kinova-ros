@@ -17,9 +17,9 @@
 
 	Test services
 
-	rosservice call /j2s6s300_driver/in/home_arm
-	rosservice call /j2s6s300_driver/in/start
-	rosservice call /j2s6s300_driver/in/stop
+	rosservice call /j2n6s300_driver/in/home_arm
+	rosservice call /j2n6s300_driver/in/start
+	rosservice call /j2n6s300_driver/in/stop
 
 
 3) Test file
@@ -55,7 +55,7 @@
 
 5) Test joint, cartesian, finger, velocity and torque controls
 
-	rosrun kinova_demo joints_action_client.py -v -r j2s6s300 degree -- 180 180 180 180 180 180
+	rosrun kinova_demo joints_action_client.py -v j2n6s300 degree -- 180 180 180 180 180 180
 
 	rosrun kinova_demo pose_action_client.py -v -r j2s6s300 mdeg --
 
