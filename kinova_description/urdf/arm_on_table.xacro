@@ -94,7 +94,7 @@
 
     <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
     <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
-		<origin xyz="0.5 -1 2" rpy="0 ${J_PI/6} ${J_PI/2}" />
+		<origin xyz="0.5 -1 1.5" rpy="0 ${J_PI/6} ${J_PI/2}" />
 	</xacro:sensor_xtion>
 
 
