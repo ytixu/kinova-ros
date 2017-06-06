@@ -46,7 +46,7 @@ I wrote a simple test file for the simulator here 'kinova_control/src/move_robot
 
 ### ARToolKit
 
-ar_tool http://wiki.ros.org/ar_tools
+ar_tools http://wiki.ros.org/ar_tools
 
 You can run some tests after installing.
 
@@ -94,13 +94,15 @@ roslaunch ar_pose ar_pose_reverse.launch
 
 ```
 
+### Adding ARToolKit Marker in Gazebo
+
+Using [gazebo_models](https://github.com/mikaelarguedas/gazebo_models), we can create mesh for .png markers. Marker link is added to `kinova_description/urdf/arm_to_table.xacro`.
+
 ### Hand to Eye Calibration
 
 vision_visp/visp_hand2eye_calibration http://wiki.ros.org/visp_hand2eye_calibration?distro=indigo
 
 Note that you can also do intrinsic calibration with vision_visp (but it doesn't have a 'nice' GUI as what camera_calibration has).
-
-
 
 ---
 
