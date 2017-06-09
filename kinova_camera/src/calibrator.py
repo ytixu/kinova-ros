@@ -45,27 +45,38 @@ def move_robot():
 class CalibrateConverter:
 
 	def __init__(self):
-		self.pub_cam = rospy.Publisher('world_effector', TransformArray, queue_size=10)
-		self.pub_arm = rospy.Publisher('camera_object', TransformArray, queue_size=10)
+		self.pub_arm = rospy.Publisher('world_effector', TransformArray, queue_size=10)
+		self.pub_cam = rospy.Publisher('camera_object', TransformArray, queue_size=10)
 
-		marker_sub = message_filters.Subscriber('/ar_pose_marker', ARMarker)
-		pose_sub = message_filters.Subscriber('/j2n6s300_driver/out/tool_pose', PoseStamped)
+		self.N = 22
+		self.count = 0
+		self.marker_data = TransformArray()
+		self.marker_data.transforms = [None]*self.N
+		self.pose_data = TransformArray()
+		self.pose_data.transforms = [None]*self.N
 
-		ts = message_filters.TimeSynchronizer([marker_sub, pose_sub], 1)
+		marker_sub = message_filters.Subscriber('ar_pose_marker', ARMarker)
+		pose_sub = message_filters.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped)
+
+		ts = message_filters.ApproximateTimeSynchronizer([marker_sub, pose_sub], 10, 0.1)
 		ts.registerCallback(self.callback)
 
-	def callback(self, markers, poses):
-		print 'publishing data'
-		marker_data = TransformArray()
-		marker_data.transforms = [self.get_marker_data(m) for m in markers]
-		pose_data = TransformArray()
-		pose_data.transforms = [self.get_pose_data(p) for p in poses]
+	def callback(self, marker, pose):
+		print self.count
+		if self.count >= self.N:
+			return
+		else:
+			self.count += 1
+			self.marker_data.transforms[self.count-1] = self.get_marker_data(marker)
+			self.pose_data.transforms[self.count-1] = self.get_pose_data(pose)
 
-		time_stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0)
-		marker_data.header.stamp = time_stamp
-		pose_data.header.stamp = time_stamp
-		self.pub_arm.publish(marker_data)
-		self.pub_cam.publish(pose_data)
+			if self.count == self.N:
+				print 'publishing data'
+				time_stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0)
+				self.marker_data.header.stamp = time_stamp
+				self.pose_data.header.stamp = time_stamp
+				self.pub_cam.publish(self.marker_data)
+				self.pub_arm.publish(self.pose_data)
 
 
 	def get_marker_data(self, data):
