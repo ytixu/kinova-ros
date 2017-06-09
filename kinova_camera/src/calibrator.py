@@ -3,6 +3,8 @@
 
 import rospy
 import copy
+import message_filters
+
 from geometry_msgs.msg import Transform
 from geometry_msgs.msg import PoseStamped
 from visp_hand2eye_calibration.msg import TransformArray
@@ -46,16 +48,27 @@ class CalibrateConverter:
 		self.pub_cam = rospy.Publisher('world_effector', TransformArray, queue_size=10)
 		self.pub_arm = rospy.Publisher('camera_object', TransformArray, queue_size=10)
 
-		self.N = 11
-		self.arm_poses = [None]*self.N
-		self.cam_poses = [None]*self.N
-		self.arm_poses_l = 0
-		self.cam_poses_l = 0
+		marker_sub = message_filters.Subscriber('/ar_pose_marker', ARMarker)
+		pose_sub = message_filters.Subscriber('/j2n6s300_driver/out/tool_pose', PoseStamped)
 
-		rospy.Subscriber('ar_pose_marker', ARMarker, self.publish_ar_marker_pose)
-		rospy.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped, self.publish_kinova_arm_pose)
+		ts = message_filters.TimeSynchronizer([marker_sub, pose_sub], 1)
+		ts.registerCallback(self.callback)
 
-	def publish_ar_marker_pose(self, data):
+	def callback(self, markers, poses):
+		print 'publishing data'
+		marker_data = TransformArray()
+		marker_data.transforms = [self.get_marker_data(m) for m in markers]
+		pose_data = TransformArray()
+		pose_data.transforms = [self.get_pose_data(p) for p in poses]
+
+		time_stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0)
+		marker_data.header.stamp = time_stamp
+		pose_data.header.stamp = time_stamp
+		self.pub_arm.publish(marker_data)
+		self.pub_cam.publish(pose_data)
+
+
+	def get_marker_data(self, data):
 		newData = Transform()
 		newData.translation.x = data.pose.pose.position.x
 		newData.translation.y = data.pose.pose.position.y
@@ -65,19 +78,10 @@ class CalibrateConverter:
 		newData.rotation.z = data.pose.pose.orientation.z
 		newData.rotation.w = data.pose.pose.orientation.w
 
-		self.cam_poses[self.cam_poses_l] = newData
-		self.cam_poses_l += 1
-
-		if self.cam_poses_l == self.N:
-			self.cam_poses_l = 0
-			pub_data = TransformArray()
-			pub_data.header.stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0);
-			pub_data.transforms = copy.copy(self.cam_poses)
-			self.pub_cam.publish(pub_data)
-			self.cam_poses = [None]*self.N
+		return newData
 
 
-	def publish_kinova_arm_pose(self, data):
+	def get_pose_data(self, data):
 		newData = Transform()
 		newData.translation.x = data.pose.position.x
 		newData.translation.y = data.pose.position.y
@@ -87,23 +91,14 @@ class CalibrateConverter:
 		newData.rotation.z = data.pose.orientation.z
 		newData.rotation.w = data.pose.orientation.w
 
-		self.arm_poses[self.arm_poses_l] = newData
-		self.arm_poses_l += 1
-
-		if self.arm_poses_l == self.N:
-			self.arm_poses_l = 0
-			pub_data = TransformArray()
-			pub_data.header.stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0);
-			pub_data.transforms = copy.copy(self.arm_poses)
-			self.pub_arm.publish(pub_data)
-			self.arm_poses = [None]*self.N
+		return newData
 
 
 if __name__ == '__main__':
 	try:
 		rospy.init_node('calibrator', anonymous=True)
-		# CalibrateConverter()
-		move_robot()
-		# rospy.spin()
+		CalibrateConverter()
+		# move_robot()
+		rospy.spin()
 	except rospy.ROSInterruptException:
 		print "program interrupted before completion"
