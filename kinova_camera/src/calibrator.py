@@ -4,6 +4,10 @@
 import rospy
 import copy
 import message_filters
+import numpy as np
+from scipy.spatial.distance import euclidean as scipy_distance
+import tf.transformations as tf
+import tf_conversions.posemath as tf_conv
 
 from geometry_msgs.msg import Transform
 from geometry_msgs.msg import PoseStamped
@@ -45,41 +49,56 @@ def move_robot():
 class CalibrateConverter:
 
 	def __init__(self):
-		self.pub_arm = rospy.Publisher('world_effector', TransformArray, queue_size=10)
-		self.pub_cam = rospy.Publisher('camera_object', TransformArray, queue_size=10)
+		self.pub_arm = rospy.Publisher('world_effector', Transform, queue_size=1)
+		self.pub_cam = rospy.Publisher('camera_object', Transform, queue_size=1)
 
-		self.N = 22
+
+		self.N = 111
 		self.count = 0
-		self.marker_data = TransformArray()
-		self.marker_data.transforms = [None]*self.N
-		self.pose_data = TransformArray()
-		self.pose_data.transforms = [None]*self.N
+		self.prev_marker = None
+		self.prev_pose = None
+		self.dist_th = 0
 
 		marker_sub = message_filters.Subscriber('ar_pose_marker', ARMarker)
 		pose_sub = message_filters.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped)
 
 		ts = message_filters.ApproximateTimeSynchronizer([marker_sub, pose_sub], 10, 0.1)
-		ts.registerCallback(self.callback)
+		ts.registerCallback(self.test)
 
 	def callback(self, marker, pose):
 		print self.count
 		if self.count >= self.N:
 			return
 		else:
-			self.count += 1
-			self.marker_data.transforms[self.count-1] = self.get_marker_data(marker)
-			self.pose_data.transforms[self.count-1] = self.get_pose_data(pose)
+			marker_data = self.get_marker_data(marker)
 
-			if self.count == self.N:
-				print 'publishing data'
-				time_stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0)
-				self.marker_data.header.stamp = time_stamp
-				self.pose_data.header.stamp = time_stamp
-				self.pub_cam.publish(self.marker_data)
-				self.pub_arm.publish(self.pose_data)
+			if marker_data == None:
+				return
+
+			pose_data = self.get_pose_data(pose)
+
+			self.count += 1
+			self.pub_cam.publish(marker_data)
+			self.pub_arm.publish(pose_data)
 
 
 	def get_marker_data(self, data):
+		new_marker = [data.pose.pose.position.x,
+			data.pose.pose.position.y,
+			data.pose.pose.position.z,
+			data.pose.pose.orientation.x,
+			data.pose.pose.orientation.y,
+			data.pose.pose.orientation.z,
+			data.pose.pose.orientation.w]
+
+		if self.prev_marker != None:
+			dist = scipy_distance(self.prev_marker, new_marker)
+			# print 'marker ', dist
+			if dist < self.dist_th:
+				return None
+
+		self.prev_marker = new_marker
+
 		newData = Transform()
 		newData.translation.x = data.pose.pose.position.x
 		newData.translation.y = data.pose.pose.position.y
@@ -103,6 +122,27 @@ class CalibrateConverter:
 		newData.rotation.w = data.pose.orientation.w
 
 		return newData
+
+
+	def test(self, marker, arm_pose):
+		trans = [3.93833851485, 11.7661743771, 1.98718172529]
+		rot = [-0.0302753219897,-0.29721511036,0.07625999815,0.951278610994]
+		cWe = tf_conv.toMatrix(tf_conv.fromTf([trans, rot]))
+
+		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(marker.pose.pose))
+		arm_mat = tf_conv.toMatrix(tf_conv.fromMsg(arm_pose.pose))
+
+		print np.dot(arm_mat, cWe)
+		print arm_mat
+
+		# print marker.pose.pose
+		# print arm_pose.pose
+		# print scipy_distance(new_marker, pose)
+
+
+
+
+
 
 
 if __name__ == '__main__':
