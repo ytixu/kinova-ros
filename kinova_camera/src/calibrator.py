@@ -52,18 +52,17 @@ class CalibrateConverter:
 		self.pub_arm = rospy.Publisher('world_effector', Transform, queue_size=1)
 		self.pub_cam = rospy.Publisher('camera_object', Transform, queue_size=1)
 
-
 		self.N = 111
 		self.count = 0
 		self.prev_marker = None
 		self.prev_pose = None
-		self.dist_th = 0
+		self.dist_th = 0.05
 
 		marker_sub = message_filters.Subscriber('ar_pose_marker', ARMarker)
 		pose_sub = message_filters.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped)
 
 		ts = message_filters.ApproximateTimeSynchronizer([marker_sub, pose_sub], 10, 0.1)
-		ts.registerCallback(self.test)
+		ts.registerCallback(self.callback)
 
 	def callback(self, marker, pose):
 		print self.count
@@ -125,15 +124,32 @@ class CalibrateConverter:
 
 
 	def test(self, marker, arm_pose):
-		trans = [3.93833851485, 11.7661743771, 1.98718172529]
-		rot = [-0.0302753219897,-0.29721511036,0.07625999815,0.951278610994]
+
+
+		# effector_camera:
+		#   translation:
+		#     x: -0.0802985650842
+		#     y: 0.162969231001
+		#     z: -0.740496613468
+		#   rotation:
+		#     x: -0.141314151906
+		#     y: 0.1878358963
+		#     z: -0.192922078107
+		#     w: 0.952643195699
+
+
+
+		trans = [-0.0802985650842, 0.162969231001, -0.740496613468]
+		rot = [-0.141314151906,0.1878358963,-0.192922078107,0.952643195699]
 		cWe = tf_conv.toMatrix(tf_conv.fromTf([trans, rot]))
 
 		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(marker.pose.pose))
 		arm_mat = tf_conv.toMatrix(tf_conv.fromMsg(arm_pose.pose))
 
-		print np.dot(arm_mat, cWe)
-		print arm_mat
+		camera_trans = np.dot(marker_mat, cWe)
+
+		print tf_conv.toMsg(tf_conv.fromMatrix(camera_trans))
+
 
 		# print marker.pose.pose
 		# print arm_pose.pose

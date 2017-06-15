@@ -81,7 +81,7 @@ http://wiki.ros.org/camera_calibration
 
 For intrinsic calibration of the camera. It has name conflict with image_proc, so we can use it independently from the workspace with ar_tools to set up the camera info.
 
-Note: I was a bit confused with their GUI because the COMMIT button doesn't work, so I went converting the INI formatted output to YAML using [camera_calibration_parsers](http://wiki.ros.org/camera_calibration_parsers). Save the .yaml file as `camera_calibration.yaml` under the folder `src/uvc_camera/uvc_camera`. (This is the name specified in ar_pose launch files.)
+Note: The checkerboard need to be on a rigid surface. I was a bit confused with their GUI because the COMMIT button doesn't work, so I went converting the INI formatted output to YAML using [camera_calibration_parsers](http://wiki.ros.org/camera_calibration_parsers). Save the .yaml file as `camera_calibration.yaml` under the folder `src/uvc_camera/uvc_camera`. (This is the name specified in ar_pose launch files.)
 
 #### Testing
 
@@ -103,6 +103,16 @@ Using [gazebo_models](https://github.com/mikaelarguedas/gazebo_models), we can c
 vision_visp/visp_hand2eye_calibration http://wiki.ros.org/visp_hand2eye_calibration?distro=indigo
 
 Note that you can also do intrinsic calibration with vision_visp (but it doesn't have a 'nice' GUI as what camera_calibration has).
+
+#### Extrinsic calibration routine
+
+Tape the AR marker onto the robot's hand. Run
+
+```
+roslaunch kinova_camera extrinsic_calibration.launch
+```
+
+In this file, you can specify the size and the image source location of the marker.
 
 ---
 
