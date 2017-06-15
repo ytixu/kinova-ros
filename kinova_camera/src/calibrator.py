@@ -2,7 +2,7 @@
 # Convert ARMarker and KinovaPose into geometry_msgs/Transform
 
 import rospy
-import copy
+import rospkg
 import message_filters
 import numpy as np
 from scipy.spatial.distance import euclidean as scipy_distance
@@ -46,17 +46,40 @@ def move_robot():
 		print result
 
 
+def get_cfg():
+	import yaml
+	file_name = rospkg.RosPack().get_path('kinova_camera')+'/config/calibration.yaml'
+	cWe = None
+	with open(file_name, 'r') as ymlfile:
+		cfg = yaml.load(ymlfile)
+
+		trans = [cfg['translation']['x'],
+				cfg['translation']['y'],
+				cfg['translation']['z']]
+		rot = [cfg['rotation']['x'],
+				cfg['rotation']['y'],
+				cfg['rotation']['z'],
+				cfg['rotation']['w']]
+
+		cWe = tf_conv.toMatrix(tf_conv.fromTf([trans, rot]))
+		print cWe
+
+	return cWe
+
+
 class CalibrateConverter:
 
 	def __init__(self):
 		self.pub_arm = rospy.Publisher('world_effector', Transform, queue_size=1)
 		self.pub_cam = rospy.Publisher('camera_object', Transform, queue_size=1)
 
-		self.N = 111
+		self.N = 200000
 		self.count = 0
 		self.prev_marker = None
 		self.prev_pose = None
-		self.dist_th = 0.05
+		self.dist_th = 0.01
+
+		self.cWe = None
 
 		marker_sub = message_filters.Subscriber('ar_pose_marker', ARMarker)
 		pose_sub = message_filters.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped)
@@ -98,14 +121,18 @@ class CalibrateConverter:
 
 		self.prev_marker = new_marker
 
+		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(data.pose.pose))
+		marker_mat = np.linalg.pinv(marker_mat)
+		data = tf_conv.toMsg(tf_conv.fromMatrix(marker_mat))
+
 		newData = Transform()
-		newData.translation.x = data.pose.pose.position.x
-		newData.translation.y = data.pose.pose.position.y
-		newData.translation.z = data.pose.pose.position.z
-		newData.rotation.x = data.pose.pose.orientation.x
-		newData.rotation.y = data.pose.pose.orientation.y
-		newData.rotation.z = data.pose.pose.orientation.z
-		newData.rotation.w = data.pose.pose.orientation.w
+		newData.translation.x = data.position.x
+		newData.translation.y = data.position.y
+		newData.translation.z = data.position.z
+		newData.rotation.x = data.orientation.x
+		newData.rotation.y = data.orientation.y
+		newData.rotation.z = data.orientation.z
+		newData.rotation.w = data.orientation.w
 
 		return newData
 
@@ -125,39 +152,20 @@ class CalibrateConverter:
 
 	def test(self, marker, arm_pose):
 
-
-		# effector_camera:
-		#   translation:
-		#     x: -0.0802985650842
-		#     y: 0.162969231001
-		#     z: -0.740496613468
-		#   rotation:
-		#     x: -0.141314151906
-		#     y: 0.1878358963
-		#     z: -0.192922078107
-		#     w: 0.952643195699
-
-
-
-		trans = [-0.0802985650842, 0.162969231001, -0.740496613468]
-		rot = [-0.141314151906,0.1878358963,-0.192922078107,0.952643195699]
-		cWe = tf_conv.toMatrix(tf_conv.fromTf([trans, rot]))
+		if self.cWe == None:
+			self.cWe = get_cfg()
 
 		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(marker.pose.pose))
+		marker_mat = np.linalg.pinv(marker_mat)
 		arm_mat = tf_conv.toMatrix(tf_conv.fromMsg(arm_pose.pose))
 
-		camera_trans = np.dot(marker_mat, cWe)
+		camera_trans = np.dot(np.dot(marker_mat, self.cWe), arm_mat)
 
 		print tf_conv.toMsg(tf_conv.fromMatrix(camera_trans))
-
 
 		# print marker.pose.pose
 		# print arm_pose.pose
 		# print scipy_distance(new_marker, pose)
-
-
-
-
 
 
 
