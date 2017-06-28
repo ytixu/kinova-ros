@@ -68,10 +68,10 @@ Note: I had to install [vision_opencv](http://wiki.ros.org/vision_opencv) under 
 
 If may need to switch between camera devices in the launch files by changing `/dev/video1` to `/dev/video0` and vice-versa if you have a laptop camera and an external usb camera.
 
-~~#### uvc_camera
-http://wiki.ros.org/uvc_camera Camera driver for ar_tools.
+#### ~~uvc_camera~~
+~~http://wiki.ros.org/uvc_camera Camera driver for ar_tools.~~
 
-Note: the node for the current version is 'uvc_camera_node' instead of 'camera_node', which you may need to change in the ar_pose launch files.~~
+~~Note: the node for the current version is 'uvc_camera_node' instead of 'camera_node', which you may need to change in the ar_pose launch files.~~
 
 #### image_proc
 http://wiki.ros.org/image_proc Image rectification for ar_tools.
