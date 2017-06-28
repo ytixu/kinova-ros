@@ -68,10 +68,10 @@ Note: I had to install [vision_opencv](http://wiki.ros.org/vision_opencv) under 
 
 If may need to switch between camera devices in the launch files by changing `/dev/video1` to `/dev/video0` and vice-versa if you have a laptop camera and an external usb camera.
 
-#### uvc_camera
+~~#### uvc_camera
 http://wiki.ros.org/uvc_camera Camera driver for ar_tools.
 
-Note: the node for the current version is 'uvc_camera_node' instead of 'camera_node', which you may need to change in the ar_pose launch files.
+Note: the node for the current version is 'uvc_camera_node' instead of 'camera_node', which you may need to change in the ar_pose launch files.~~
 
 #### image_proc
 http://wiki.ros.org/image_proc Image rectification for ar_tools.
@@ -102,17 +102,40 @@ Using [gazebo_models](https://github.com/mikaelarguedas/gazebo_models), we can c
 
 vision_visp/visp_hand2eye_calibration http://wiki.ros.org/visp_hand2eye_calibration?distro=indigo
 
-Note that you can also do intrinsic calibration with vision_visp (but it doesn't have a 'nice' GUI as what camera_calibration has).
-
 #### Extrinsic calibration routine
 
 Tape the AR marker onto the robot's hand. Run
 
 ```
 roslaunch kinova_camera extrinsic_calibration.launch
+rosrun kinova_camera calibrator
 ```
 
-In this file, you can specify the size and the image source location of the marker.
+In the launch file, you can specify the size and the image source location of the marker.
+
+
+## Milestone 3: Camera Calibration with Kinect
+
+Launch Kinect with [freenect_launch](http://wiki.ros.org/freenect_launch), which will replace `uvc_camera`.
+
+Calibrate as in this [tutorial](http://wiki.ros.org/openni_launch/Tutorials/IntrinsicCalibration). For convinience, I saved the intrinsics in `kinova_camera/config/intrinsic_calibration.yaml`, which is specified in `kinova_camera/launch/extrinsic_calibration.launch`
+
+Remap the message in `ar_tools/ar_pose/include/ar_single.h` (and recompile).
+```
+const std::string cameraImageTopic_ = "/camera/rgb/image_raw";
+const std::string cameraInfoTopic_  = "/camera/rgb/camera_info";
+```
+
+#### Testing
+
+To test if camera works with `ar_pose`, run
+
+```
+roslaunch kinova_camera extrinsic_calibration.launch
+rostopic echo /ar_pose_marker
+```
+
+The default marker is `4x4_98.patt, with size 35.
 
 ---
 

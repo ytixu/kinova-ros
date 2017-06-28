@@ -62,6 +62,8 @@ def get_cfg():
 				cfg['rotation']['w']]
 
 		cWe = tf_conv.toMatrix(tf_conv.fromTf([trans, rot]))
+		cWe = np.linalg.pinv(cWe)
+
 		print cWe
 
 	return cWe
@@ -73,11 +75,11 @@ class CalibrateConverter:
 		self.pub_arm = rospy.Publisher('world_effector', Transform, queue_size=1)
 		self.pub_cam = rospy.Publisher('camera_object', Transform, queue_size=1)
 
-		self.N = 200000
+		self.N = 3
 		self.count = 0
 		self.prev_marker = None
 		self.prev_pose = None
-		self.dist_th = 0.01
+		self.dist_th = 0.05
 
 		self.cWe = None
 
@@ -85,7 +87,7 @@ class CalibrateConverter:
 		pose_sub = message_filters.Subscriber('j2n6s300_driver/out/tool_pose', PoseStamped)
 
 		ts = message_filters.ApproximateTimeSynchronizer([marker_sub, pose_sub], 10, 0.1)
-		ts.registerCallback(self.callback)
+		ts.registerCallback(self.test)
 
 	def callback(self, marker, pose):
 		print self.count
@@ -98,6 +100,9 @@ class CalibrateConverter:
 				return
 
 			pose_data = self.get_pose_data(pose)
+
+			print tf_conv.toMatrix(tf_conv.fromMsg(marker.pose.pose))
+			print tf_conv.toMatrix(tf_conv.fromMsg(pose.pose))
 
 			self.count += 1
 			self.pub_cam.publish(marker_data)
@@ -121,31 +126,27 @@ class CalibrateConverter:
 
 		self.prev_marker = new_marker
 
-		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(data.pose.pose))
-		marker_mat = np.linalg.pinv(marker_mat)
-		data = tf_conv.toMsg(tf_conv.fromMatrix(marker_mat))
-
 		newData = Transform()
-		newData.translation.x = data.position.x
-		newData.translation.y = data.position.y
-		newData.translation.z = data.position.z
-		newData.rotation.x = data.orientation.x
-		newData.rotation.y = data.orientation.y
-		newData.rotation.z = data.orientation.z
-		newData.rotation.w = data.orientation.w
+		newData.translation.x = round(data.pose.pose.position.x, 2)
+		newData.translation.y = round(data.pose.pose.position.y, 2)
+		newData.translation.z = round(data.pose.pose.position.z, 2)
+		newData.rotation.x = round(data.pose.pose.orientation.x, 2)
+		newData.rotation.y = round(data.pose.pose.orientation.y, 2)
+		newData.rotation.z = round(data.pose.pose.orientation.z, 2)
+		newData.rotation.w = round(data.pose.pose.orientation.w, 2)
 
 		return newData
 
 
 	def get_pose_data(self, data):
 		newData = Transform()
-		newData.translation.x = data.pose.position.x
-		newData.translation.y = data.pose.position.y
-		newData.translation.z = data.pose.position.z
-		newData.rotation.x = data.pose.orientation.x
-		newData.rotation.y = data.pose.orientation.y
-		newData.rotation.z = data.pose.orientation.z
-		newData.rotation.w = data.pose.orientation.w
+		newData.translation.x = round(data.pose.position.x, 2)
+		newData.translation.y = round(data.pose.position.y, 2)
+		newData.translation.z = round(data.pose.position.z, 2)
+		newData.rotation.x = round(data.pose.orientation.x, 2)
+		newData.rotation.y = round(data.pose.orientation.y, 2)
+		newData.rotation.z = round(data.pose.orientation.z, 2)
+		newData.rotation.w = round(data.pose.orientation.w, 2)
 
 		return newData
 
@@ -158,15 +159,13 @@ class CalibrateConverter:
 		marker_mat = tf_conv.toMatrix(tf_conv.fromMsg(marker.pose.pose))
 		marker_mat = np.linalg.pinv(marker_mat)
 		arm_mat = tf_conv.toMatrix(tf_conv.fromMsg(arm_pose.pose))
+		arm_mat = np.linalg.pinv(arm_mat)
 
-		camera_trans = np.dot(np.dot(marker_mat, self.cWe), arm_mat)
+		for i, _ in enumerate(marker_mat):
+			camera_pose = np.dot(np.dot(marker_mat[i], self.cWe), arm_mat[i])
 
-		print tf_conv.toMsg(tf_conv.fromMatrix(camera_trans))
-
-		# print marker.pose.pose
-		# print arm_pose.pose
-		# print scipy_distance(new_marker, pose)
-
+		print camera_pose
+		print tf_conv.toMsg(tf_conv.fromMatrix(camera_pose))
 
 
 if __name__ == '__main__':
