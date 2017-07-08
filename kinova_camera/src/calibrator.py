@@ -75,7 +75,7 @@ class CalibrateConverter:
 		self.pub_arm = rospy.Publisher('world_effector', Transform, queue_size=1)
 		self.pub_cam = rospy.Publisher('camera_object', Transform, queue_size=1)
 
-		self.N = 3
+		self.N = 55
 		self.count = 0
 		self.prev_marker = None
 		self.prev_pose = None
@@ -160,11 +160,13 @@ class CalibrateConverter:
 		marker_mat = np.linalg.pinv(marker_mat)
 		arm_mat = tf_conv.toMatrix(tf_conv.fromMsg(arm_pose.pose))
 		arm_mat = np.linalg.pinv(arm_mat)
+		cWe = np.linalg.pinv(self.cWe)
 
-		for i, _ in enumerate(marker_mat):
-			camera_pose = np.dot(np.dot(marker_mat[i], self.cWe), arm_mat[i])
+		# camera_pose = np.dot(np.dot(arm_mat, self.cWe), marker_mat)
+		camera_pose = np.dot(np.dot(marker_mat, cWe), arm_mat)
+		# camera_pose = np.dot(marker_mat, self.cWe)
 
-		print camera_pose
+		# print camera_pose
 		print tf_conv.toMsg(tf_conv.fromMatrix(camera_pose))
 
 
