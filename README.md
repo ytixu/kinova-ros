@@ -143,7 +143,7 @@ rostopic echo /ar_pose_marker
 
 The default marker is `4x4_98.patt, with size 35`.
 
-THIS SECTION IS NOT FINALLISED 
+THIS SECTION IS NOT FINALISED 
 
 ---
 
