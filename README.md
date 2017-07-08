@@ -141,7 +141,7 @@ roslaunch kinova_camera extrinsic_calibration.launch
 rostopic echo /ar_pose_marker
 ```
 
-The default marker is `4x4_98.patt, with size 35`.
+The default marker is `4x4_98.patt`, with size 35.
 
 THIS SECTION IS NOT FINALISED 
 
