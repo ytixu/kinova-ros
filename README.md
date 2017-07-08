@@ -6,6 +6,10 @@ You can also download the SDK from http://www.kinovarobotics.com/innovation-robo
 
 Note that the original repo from Kinova has been updated various times since I forked it. I have merged the change (until July 8) to branch `jaco-on-table-updated` (without testing it).
 
+### Testing with the real arm
+
+Some test commands can be found in this file: https://github.com/ytixu/kinova-ros/blob/jaco-on-table/test.txt
+
 # JACO ON TABLE
 
 ## Milestone 1: Simulator
@@ -43,7 +47,7 @@ You can use https://github.com/ros-industrial-consortium/fermi
 
 Xtion sensor can be added to the simulation by uncommenting the section at the send of `kinova_description/urdf/arm_to_table.xacro` file.
 
-### Testing the arm
+### Testing the arm (in simulator)
 
 You can find the test file as the original Kinova repo in `kinova_demo/nodes/kinova_demo/textActionSvr.py`.
 
