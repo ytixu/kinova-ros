@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="marker_4x4_98_link" params="link_name">
+        <link name="marker_4x4_98">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://kinova_description/meshes/markers/4x4_98.dae" scale="0.09 0.09 0.09"/>
+                </geometry>
+            </visual>
+        </link>
+    </xacro:macro>
+</root>

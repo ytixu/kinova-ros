@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!-- j2n6s300 (refers to jaco v2 6DOF non-spherical 3fingers) on a table -->
+
+<robot name="j2n6s300_on_table" xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<link name="world"/>
+
+	<xacro:include filename="$(find kinova_description)/urdf/j2n6s300.xacro"/>
+
+	<joint name="base_to_jaco_on_table" type="fixed">
+		<origin xyz="0 0 0" rpy="0 0 0" />
+		<parent link="world" />
+		<child link="robot_base" />
+	</joint>
+
+	<link name="robot_base">
+		<static>false</static>
+	</link>
+
+	<xacro:include filename="$(find kinova_description)/urdf/objects/table.xacro" />
+	<joint name="table_to_arm" type="fixed">
+		<origin xyz="0.40488474042 0.27988474042 0.3" rpy="0 0 ${J_PI/4}" />
+		<parent link="robot_base"/>
+		<child link="table_base"/>
+	</joint>
+
+	<xacro:include filename="$(find kinova_description)/urdf/objects/arm_stand.xacro" />
+	<xacro:arm_stand_link link_name="arm_stand"/>
+
+	<joint name="j2b" type="fixed">
+		<origin xyz="0 -0.035 0" rpy="-${J_PI/2} -${J_PI} 0" /> <!-- set the arm "inside" the table for now because of the rim along the real table. creating a bit of a buffer zone so moveit trajectories are within safe distance of the table edges. -->
+		<parent link="tabletop_corner" />
+		<child link="arm_stand" />
+		<axis xyz="0 0 0" />
+	</joint>
+
+	<link name="root">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size = "0 0 0"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size = "0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="jaco_to_table" type="fixed">
+		<origin xyz="-0.000482247085224208 0.08 -0.000503436190578577" rpy="${J_PI/2} 0 ${J_PI}" />
+		<parent link="arm_stand"/>
+		<child link="root"/>
+	</joint>
+
+	<!-- Add robot arm -->
+
+	<property name="robot_root" value="root" />
+
+	<xacro:j2n6s300 base_parent="${robot_root}"/>
+
+	<!-- Add the Xtion to the arm: code from here https://github.com/JenniferBuehler/common-sensors.git
+
+	<joint name="toxtion_on_arm_base" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="j2n6s300_link_6" />
+        <child link="xtion_on_arm_base" />
+    </joint>
+
+    <link name="xtion_on_arm_base">
+        <static>false</static>
+    </link>
+
+    <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
+    <xacro:sensor_xtion parent="xtion_on_arm_base" camera_name="xtion">
+		<origin xyz="0 -0.08 -0.05" rpy="${J_PI} ${J_PI/2} ${J_PI/2}" />
+	</xacro:sensor_xtion>  -->
+
+
+	<!-- Add the Xtion to the world: code from here https://github.com/JenniferBuehler/common-sensors.git -->
+
+	<joint name="toxtion_base" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="world" />
+        <child link="xtion_base" />
+    </joint>
+
+    <link name="xtion_base">
+        <static>false</static>
+    </link>
+
+    <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
+    <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
+		<origin xyz="0.5 -0.8 1.5" rpy="0 ${J_PI/8} ${J_PI/2}" />
+	</xacro:sensor_xtion>
+
+	<!-- Adding marker -->
+
+	<joint name="to_marker" type="fixed">
+		<origin xyz="-0.0255 0 -0.12" rpy="0 ${J_PI/2} 0" />
+        <parent link="j2n6s300_link_6" />
+        <child link="marker_4x4_98" />
+    </joint>
+
+	<xacro:include filename="$(find kinova_description)/urdf/markers/marker_4x4_98.xacro" />
+	<xacro:marker_4x4_98_link link_name="marker_4x4_98"/>
+
+
+</robot>

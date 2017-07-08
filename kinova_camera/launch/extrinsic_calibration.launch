@@ -1,0 +1,33 @@
+<launch>
+  <!-- Camera node-->
+  <include file="$(find freenect_launch)/launch/freenect.launch">
+    <param name="rgb_camera_info_url"
+          value="$(find kinova_camera)/config/intrinsic_calibration.yaml" />
+    <!-- <param name="depth_camera_info_url" default="" /> -->
+  </include>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_to_cam"
+    args="0 0 0.5 -1.57 0 -1.57 world camera 10" />
+  <node ns="camera" pkg="image_proc" type="image_proc" name="image_proc"/>
+
+  <node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false"
+    output="screen">
+    <param name="marker_pattern" type="string"
+      value="$(find ar_pose)/data/4x4/4x4_89.patt"/>
+    <param name="marker_width" type="double" value="35"/>
+    <param name="marker_center_x" type="double" value="0.0"/>
+    <param name="marker_center_y" type="double" value="0.0"/>
+    <param name="threshold" type="int" value="100"/>
+    <param name="use_history" type="bool" value="true"/>
+  </node>
+
+  <!-- image view nodes -->
+  <node name="image_view_rgb" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/camera/rgb/image_raw"/>
+    <param name="autosize" value="true" />
+  </node>
+  <node name="image_view_depth" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/camera/depth/image_raw"/>
+    <param name="autosize" value="true" />
+  </node>
+</launch>

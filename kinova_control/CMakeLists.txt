@@ -12,5 +12,6 @@ install(DIRECTORY launch
 
 install(PROGRAMS
   src/move_robot.py
+  src/move_robot_test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
