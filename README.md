@@ -1,3 +1,9 @@
+# Installation
+
+You can follow the installation instruction in the original package from Kinova: https://github.com/Kinovarobotics/kinova-ros#installation (i.e.: just clone this repo under `<your_catkin_workspace>/src` and run `catkin_make`).
+
+You can also download the SDK from http://www.kinovarobotics.com/innovation-robotics/products/software/ which can serve as a primary test for checking the arm's connection with your device. 
+
 # JACO ON TABLE
 
 ## Milestone 1: Simulator
@@ -37,9 +43,9 @@ Xtion sensor can be added to the simulation by uncommenting the section at the s
 
 ### Testing the arm
 
-You can find the test file as the original Kinova repo in 'kinova_demo/nodes/kinova_demo/textActionSvr.py'.
+You can find the test file as the original Kinova repo in `kinova_demo/nodes/kinova_demo/textActionSvr.py`.
 
-I wrote a simple test file for the simulator here 'kinova_control/src/move_robot_test.py'. Torque and velocity control are apparently not implemented for the simulator.
+I wrote a simple test file for the simulator here `kinova_control/src/move_robot_test.py`. Torque and velocity control are apparently not implemented for the simulator.
 
 
 ## Milestone 2: Camera Calibration
@@ -135,7 +141,9 @@ roslaunch kinova_camera extrinsic_calibration.launch
 rostopic echo /ar_pose_marker
 ```
 
-The default marker is `4x4_98.patt, with size 35.
+The default marker is `4x4_98.patt, with size 35`.
+
+THIS SECTION IS NOT FINALLISED 
 
 ---
 
