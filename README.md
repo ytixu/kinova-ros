@@ -6,9 +6,11 @@ You can also download the SDK from http://www.kinovarobotics.com/innovation-robo
 
 Note that the original repo from Kinova has been updated various times since I forked it. I have merged the change (until July 8) to branch `jaco-on-table-updated` (without testing it).
 
-### Testing with the real arm
+### Testing
 
-Some test commands can be found in this file: https://github.com/ytixu/kinova-ros/blob/jaco-on-table/test.txt
+Some test commands for the real arm can be found in this file: https://github.com/ytixu/kinova-ros/blob/jaco-on-table/test.txt
+
+For testing the simulator, see https://github.com/ytixu/kinova-ros/blob/jaco-on-table/README.md#testing-the-arm-in-simulator
 
 # JACO ON TABLE
 
