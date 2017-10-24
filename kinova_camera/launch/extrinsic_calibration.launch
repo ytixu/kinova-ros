@@ -1,5 +1,5 @@
 <launch>
-  <!-- Camera node -->
+  <!-- Camera node-->
   <include file="$(find freenect_launch)/launch/freenect.launch">
     <param name="rgb_camera_info_url"
           value="$(find kinova_camera)/config/intrinsic_calibration.yaml" />
@@ -13,7 +13,7 @@
   <node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false"
     output="screen">
     <param name="marker_pattern" type="string"
-      value="$(find ar_pose)/data/4x4/4x4_98.patt"/>
+      value="$(find ar_pose)/data/4x4/4x4_89.patt"/>
     <param name="marker_width" type="double" value="35"/>
     <param name="marker_center_x" type="double" value="0.0"/>
     <param name="marker_center_y" type="double" value="0.0"/>
