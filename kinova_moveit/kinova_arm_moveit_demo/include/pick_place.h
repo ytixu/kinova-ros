@@ -99,22 +99,33 @@ namespace kinova
         geometry_msgs::PoseStamped pregrasp_pose_;
         geometry_msgs::PoseStamped postgrasp_pose_;
 
+        double rand_x;
+        double rand_y;
+        double rand_z;
 
         void build_workscene();
         void add_obstacle();
+        void add_obstacle_from_size(double x, double y, double z);
+        void random_obstacle();
+        void reset_obstacle();
         void add_complex_obstacle();
         void clear_obstacle();
         void clear_workscene();
         void add_attached_obstacle();
         void add_target();
+        void add_target_from_size(double h, double r, double x, double y, double z);
+        void reset_target();
+        void random_target();
 
         void define_joint_values();
         void define_cartesian_pose();
+        void set_cartesian_pose(double x, double y, double z);
         geometry_msgs::PoseStamped generate_gripper_align_pose(geometry_msgs::PoseStamped targetpose_msg, double dist, double azimuth, double polar, double rot_gripper_z);
         void setup_constrain(geometry_msgs::Pose target_pose, bool orientation, bool position);
         void check_constrain();
 
         bool my_pick();
+        bool random_pick();
         bool my_place();
 
         void get_current_state(const sensor_msgs::JointStateConstPtr &msg);
@@ -123,6 +134,7 @@ namespace kinova
         void getInvK(geometry_msgs::Pose &eef_pose, std::vector<double> &joint_value);
         void check_collision();
         void evaluate_plan(moveit::planning_interface::MoveGroup &group);
+        bool evaluate_and_execute_plan(moveit::planning_interface::MoveGroup &group);
         bool gripper_action(double gripper_rad);
     };
 }
