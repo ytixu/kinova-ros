@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <ctime>
 #include <pick_place.h>
 #include <ros/console.h>
 
@@ -825,8 +826,8 @@ bool PickPlace::evaluate_and_execute_plan(moveit::planning_interface::MoveGroup 
         //     group.execute(my_plan);
         // }
         group.execute(my_plan);
+        ros::WallDuration(3.0).sleep();
     }
-    ros::WallDuration(3.0).sleep();
     return result_;
 }
 
@@ -834,36 +835,31 @@ bool PickPlace::evaluate_and_execute_plan(moveit::planning_interface::MoveGroup 
 
 bool PickPlace::random_pick()
 {
-    clear_workscene();
-    ros::WallDuration(1.0).sleep();
-    build_workscene();
-    ros::WallDuration(1.0).sleep();
-
-    // Home position
-    group_->clearPathConstraints();
-    group_->setNamedTarget("Home");
-    evaluate_and_execute_plan(*group_);
-
-    int max_attempts = 10;
+    srand(time(NULL));
+    bool has_path = true;
+    gripper_action(0.0);
 
     for (int i=0; i<100; i++)
     {
-        random_target();
-        gripper_action(0.0);
-        group_->setPoseTarget(pregrasp_pose_);
+        clear_workscene();
+        // ros::WallDuration(1.0).sleep();
+        build_workscene();
+        ros::WallDuration(1.0).sleep();
 
-        int attemps = 0;
-        bool has_path = evaluate_and_execute_plan(*group_);
-
-        while (!has_path && attemps < max_attempts)
+        // Home position
+        group_->clearPathConstraints();
+        if (has_path)
         {
-            has_path = evaluate_and_execute_plan(*group_);
-            reset_target();
-            max_attempts ++;
+            group_->setNamedTarget("Home");
+            evaluate_and_execute_plan(*group_);
         }
 
+        random_target();
         group_->setPoseTarget(grasp_pose_);
         has_path = evaluate_and_execute_plan(*group_);
+
+        // group_->setPoseTarget(grasp_pose_);
+        // has_path = evaluate_and_execute_plan(*group_);
 
         if (has_path)
         {
