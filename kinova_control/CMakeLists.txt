@@ -13,5 +13,7 @@ install(DIRECTORY launch
 install(PROGRAMS
   src/move_robot.py
   src/move_robot_test.py
+  src/robot_skeleton.py
+  src/robot_pose_pic.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
