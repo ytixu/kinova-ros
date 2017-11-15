@@ -4,7 +4,7 @@ You can follow the installation instruction in the original package from Kinova:
 
 You can also download the SDK from http://www.kinovarobotics.com/innovation-robotics/products/software/ which can serve as a primary test for checking the arm's connection with your device. 
 
-Note that the original repo from Kinova has been updated various times since I forked it. I have merged the change (until July 8) to branch `jaco-on-table-updated` (without testing it).
+Note that the original repo from Kinova has been updated various times since I forked it. I have merged the change (until July 8) to branch `jaco-on-table-updated` (since then some other code has been pushed to there).
 
 ### Testing
 
