@@ -387,8 +387,8 @@ void PickPlace::add_target()
 
 void PickPlace::reset_target()
 {
-    double x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 3.0 + 0.2;
-    double y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 3.0 + 0.2;
+    double x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 3.0 + 0.3;
+    double y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 3.0 + 0.3;
     double z = rand_x / 2.0;
 
     std::cout << "Position: " << x << ", " << y << ", " << z;
@@ -469,16 +469,44 @@ void PickPlace::set_cartesian_pose(double x, double y, double z)
     grasp_pose_.pose.position.y = y;
     grasp_pose_.pose.position.z = z;
 
+
     tf::Quaternion q = EulerZYZ_to_Quaternion(-M_PI/4, M_PI/2, M_PI);
     grasp_pose_.pose.orientation.x = q.x();
     grasp_pose_.pose.orientation.y = q.y();
     grasp_pose_.pose.orientation.z = q.z();
     grasp_pose_.pose.orientation.w = q.w();
 
-    grasp_pose_= generate_gripper_align_pose(grasp_pose_, rand_y + 0.00999, M_PI/4, M_PI/2, M_PI);
+    // dot = x1*x2 + y1*y2      # dot product between [x1, y1] and [x2, y2]
+    // det = x1*y2 - y1*x2      # determinant
+    // angle = atan2(det, dot)
+
+    grasp_pose_= generate_gripper_align_pose(grasp_pose_, rand_y + 0.00999, atan2(y, x) , M_PI/2, M_PI);
     pregrasp_pose_ = generate_gripper_align_pose(grasp_pose_, rand_y + 0.6, M_PI/4, M_PI/2, M_PI);
     postgrasp_pose_ = grasp_pose_;
     postgrasp_pose_.pose.position.z = grasp_pose_.pose.position.z + 0.05;
+
+    start_pose_.header.frame_id = "root";
+    start_pose_.header.stamp = ros::Time::now();
+
+    double x_ = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 2.0 + 0.2;
+    double y_ = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) / 20.0 + 0.02;
+    if (rand() % 2 == 1)
+    {
+        x_ *= -1;
+    }
+    if (rand() % 2 == 1)
+    {
+        y_ *= -1;
+    }
+
+    start_pose_.pose.position.x = x_;
+    start_pose_.pose.position.y = y_;
+    start_pose_.pose.position.z = grasp_pose_.pose.position.z;
+    start_pose_.pose.orientation.x = q.x();
+    start_pose_.pose.orientation.y = q.y();
+    start_pose_.pose.orientation.z = q.z();
+    start_pose_.pose.orientation.w = q.w();
+
 }
 
 void PickPlace::define_cartesian_pose()
@@ -782,7 +810,7 @@ bool PickPlace::evaluate_and_execute_plan(moveit::planning_interface::MoveGroup 
 
         // try to find a success plan.
         double plan_time;
-        while (result_ == false && count < 5)
+        while (result_ == false && count < 1)
         {
             count++;
             plan_time = 20+count*10;
@@ -839,7 +867,7 @@ bool PickPlace::random_pick()
     bool has_path = true;
     gripper_action(0.0);
 
-    for (int i=0; i<100; i++)
+    for (int i=0; i<10000; i++)
     {
         clear_workscene();
         // ros::WallDuration(1.0).sleep();

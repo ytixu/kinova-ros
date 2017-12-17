@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- j2n6s300 (refers to jaco v2 6DOF non-spherical 3fingers) on a table -->
+
+<robot name="j2n6s300_on_table" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <link name="world"/>
+
+    <xacro:include filename="$(find kinova_description)/urdf/j2n6s300.xacro"/>
+
+    <link name="root">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size = "0 0 0"/>
+            </geometry>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size = "0 0 0"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="connect_root_and_world" type="fixed">
+        <child link="root" />
+        <parent link="world" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <!-- Add robot arm -->
+
+    <property name="robot_root" value="root" />
+
+    <xacro:j2n6s300 base_parent="${robot_root}"/>
+
+    <!-- Add the Xtion to the world: code from here https://github.com/JenniferBuehler/common-sensors.git -->
+
+    <joint name="toxtion_base" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="world" />
+        <child link="xtion_base" />
+    </joint>
+
+    <link name="xtion_base">
+        <static>false</static>
+    </link>
+
+    <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
+    <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
+        <origin xyz="0 0 3" rpy="0 ${J_PI/2} ${J_PI/2}" />
+    </xacro:sensor_xtion>
+
+</robot>

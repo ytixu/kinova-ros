@@ -9,8 +9,9 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planning Metrics1
+        - /Camera1
       Splitter Ratio: 0.74256
-    Tree Height: 332
+    Tree Height: 159
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -59,6 +60,7 @@ Visualization Manager:
           Z: 2
       Name: MotionPlanning
       Planned Path:
+        Color Enabled: false
         Interrupt Display: false
         Links:
           All Links Enabled: true
@@ -141,8 +143,13 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
         Loop Animation: false
         Robot Alpha: 0.5
+        Robot Color: 150; 50; 150
         Show Robot Collision: false
         Show Robot Visual: true
         Show Trail: false
@@ -259,10 +266,29 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
         Robot Alpha: 0.5
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /xtion/rgb/image_raw
+      Name: Camera
+      Overlay Alpha: 0.5
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+      Visibility:
+        Grid: true
+        MotionPlanning: true
+        Value: true
+      Zoom Factor: 1
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -278,7 +304,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.9965
+      Distance: 2.00068
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -290,12 +316,14 @@ Visualization Manager:
         Z: 2.23518e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.474797
+      Pitch: 0.184798
       Target Frame: root
       Value: XYOrbit (rviz)
-      Yaw: 3.00176
+      Yaw: 1.52676
     Saved: ~
 Window Geometry:
+  Camera:
+    collapsed: false
   Displays:
     collapsed: false
   Height: 1028
@@ -305,9 +333,9 @@ Window Geometry:
   Hide Right Dock: false
   Motion Planning:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002b1000003befc0200000005fb000000100044006900730070006c0061007900730100000028000001e1000000dd00fffffffb0000000800480065006c00700000000342000000bb0000007600fffffffb0000000a0056006900650077007300000003b0000000b0000000b000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e0067010000020f000001d7000001cc00ffffff0000046d000003be00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002b2000003befc0200000006fb000000100044006900730070006c006100790073010000002800000134000000dd00fffffffb0000000800480065006c00700000000342000000bb0000007600fffffffb0000000a0056006900650077007300000003b0000000b0000000b000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000162000001d7000001cc00fffffffb0000000c00430061006d006500720061010000033f000000a70000001600ffffff000000e7000003be00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1828
-  X: 41
+  Width: 927
+  X: 55
   Y: 14

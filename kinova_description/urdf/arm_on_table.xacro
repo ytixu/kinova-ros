@@ -19,7 +19,7 @@
 
 	<xacro:include filename="$(find kinova_description)/urdf/objects/table.xacro" />
 	<joint name="table_to_arm" type="fixed">
-		<origin xyz="0.40488474042 0.27988474042 0.3" rpy="0 0 ${J_PI/4}" />
+		<origin xyz="0 0 0.3" rpy="0 0 0" />
 		<parent link="robot_base"/>
 		<child link="table_base"/>
 	</joint>
@@ -94,7 +94,7 @@
 
     <xacro:include filename="$(find common_sensors)/urdf/sensors/xtion.urdf.xacro"/>>
     <xacro:sensor_xtion parent="xtion_base" camera_name="xtion">
-		<origin xyz="0.5 -0.8 1.5" rpy="0 ${J_PI/8} ${J_PI/2}" />
+		<origin xyz="0.5 0.5 3" rpy="0 ${J_PI/2} ${J_PI/2}" />
 	</xacro:sensor_xtion>
 
 	<!-- Adding marker -->
