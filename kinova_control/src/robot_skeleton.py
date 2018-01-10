@@ -11,7 +11,7 @@ from gazebo_msgs.msg import LinkState
 from gazebo_msgs.srv import GetLinkState
 
 links =  ['j2s7s300::root', 'j2s7s300::j2s7s300_link_1', 'j2s7s300::j2s7s300_link_2', 'j2s7s300::j2s7s300_link_3', 'j2s7s300::j2s7s300_link_4', 'j2s7s300::j2s7s300_link_5', 'j2s7s300::j2s7s300_link_6', 'j2s7s300::j2s7s300_link_7', 'j2s7s300::j2s7s300_link_finger_1', 'j2s7s300::j2s7s300_link_finger_2', 'j2s7s300::j2s7s300_link_finger_3']
-THRSH = 0.0
+THRSH = 0.1
 
 class robot_recorder:
 	def __init__(self):
@@ -44,7 +44,8 @@ class robot_recorder:
 							js.link_state.pose.orientation.x, js.link_state.pose.orientation.y, js.link_state.pose.orientation.z]
 
 		pose_mat = np.array([js[:3] for js in states.values()])
-		if np.linalg.norm(np.round(pose_mat) - np.round(self.record_pose)) > THRSH:
+		diff = np.linalg.norm(pose_mat - self.record_pose)
+		if diff > THRSH:
 			self.record_pose = pose_mat
 			self.count += 1
 			# print self.count
@@ -59,17 +60,17 @@ class robot_recorder:
 					[js + '-velocity' for js in joint_states.name] + \
 					[js + '-effort' for js in joint_states.name]
 
-			for ls in link_state.keys():
+			for ls in links:
 				self.header = self.header + \
-					[ls+'-x', ls+'-y', ls+'-z', ls+'-ox', ls+'-oy', ls+'oz']
+					[ls+'-x', ls+'-y', ls+'-z', ls+'-ox', ls+'-oy', ls+'-oz']
 			# self.header = self.header + \
 			# 		['object-height', 'object-radius', 'object-pos-x', 'object-pos-y', 'object-pos-z']
 
 			print '\t'.join(self.header)
 
 		line = list(joint_states.position) + list(joint_states.velocity) + list(joint_states.effort)
-		for ls in link_state.values():
-			line = line + ls
+		for ls in links:
+			line = line + link_state[ls]
 
 		# line = line + [self.record_obstacles.primitives[0].dimensions[0],
 		# 		self.record_obstacles.primitives[0].dimensions[1],
