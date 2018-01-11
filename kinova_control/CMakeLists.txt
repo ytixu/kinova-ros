@@ -15,5 +15,7 @@ install(PROGRAMS
   src/move_robot_test.py
   src/robot_skeleton.py
   src/robot_pose_pic.py
+  src/mimic_kinect.py
+  src/mimic_openpose_kinect.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
