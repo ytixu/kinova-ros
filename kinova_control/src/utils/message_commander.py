@@ -8,7 +8,9 @@ import tf.transformations as tf
 from sklearn.metrics.pairwise import cosine_similarity as scipy_cos_similarity
 from std_msgs.msg import Header
 from moveit_msgs.msg import Constraints, OrientationConstraint, JointConstraint
-from geometry_msgs.msg import PoseStamped, PointStamped
+from geometry_msgs.msg import Pose, PoseStamped, PointStamped
+
+from move_queue import MoveQueue
 
 # number of frames before mimicing an action
 STEP_DIFF = 5
@@ -21,13 +23,14 @@ LOW_REACH = 0.1
 LOW_GRAB = 0.05
 MIN_DIST = 0.1
 MAX_DIST = 0.5
-BASE_HEIGHT = 0.2755
+BASE_HEIGHT = 0.2755*3
 RAND_POSE_N = 1
 ARM_INIT_POSE = np.array([0,0,1])
 
+
 def end_effector_orientation_constraint(group, quad):
 	const = Constraints()
-	const.name = 'elbow_up'
+	const.name = 'angle_constraint'
 	const.orientation_constraints = [OrientationConstraint()]
 	const.orientation_constraints[0].header = Header()
 	const.orientation_constraints[0].header.frame_id = group.get_pose_reference_frame()
@@ -36,9 +39,9 @@ def end_effector_orientation_constraint(group, quad):
 	const.orientation_constraints[0].orientation.y = quad[1]
 	const.orientation_constraints[0].orientation.z = quad[2]
 	const.orientation_constraints[0].orientation.w = quad[3]
-	const.orientation_constraints[0].absolute_x_axis_tolerance = 0.1
-	const.orientation_constraints[0].absolute_y_axis_tolerance = 0.1
-	const.orientation_constraints[0].absolute_z_axis_tolerance = 0.1
+	const.orientation_constraints[0].absolute_x_axis_tolerance = 0.5
+	const.orientation_constraints[0].absolute_y_axis_tolerance = 0.5
+	const.orientation_constraints[0].absolute_z_axis_tolerance = 0.5
 	const.orientation_constraints[0].weight = 1.0
 	return const
 
@@ -53,13 +56,28 @@ def shoulder_constraint(group):
 	const.joint_constraints[0].weight = 1.0
 	return const
 
+def joint_position_constraint(group, coords):
+	const = Constraints()
+	const.name = 'joint_pose_constraint'
+	const.joint_constraints = [None]*6
+	curr_val = group.get_current_joint_values()
+	for i in range(6):
+		const.joint_constraints[i] = JointConstraint()
+		const.joint_constraints[i].joint_name = 'j2s7s300_joint_%d'%(i+1)
+		const.joint_constraints[i].position = curr_val[i]
+		const.joint_constraints[i].tolerance_above = 0.4
+		const.joint_constraints[i].tolerance_below = 0.4
+		const.joint_constraints[i].weight = 1.0
+
+	return const
 
 def plan_and_move(group, coords, angle=True):
 	try:
 		if angle:
 			group.set_joint_value_target(coords)
 		else:
-			group.set_pose_target(coords)
+			group.set_position_target(coords[:3])
+			# group.set_pose_target(coords)
 
 		plan = group.plan()
 		return group.execute(plan)
@@ -78,6 +96,7 @@ class BadArmException(Exception):
         Exception.__init__(self,"Bad arm {0}".format(dErrArguments))
         self.dErrorArguments = dErrorArguements
 
+
 class MessageCommander:
 
 	def __init__(self, close_gripper=True):
@@ -92,6 +111,9 @@ class MessageCommander:
 		self.pose_pub = rospy.Publisher('mimic_pose', PoseStamped, queue_size=10)
 		self.hand_pub = rospy.Publisher('mimic_hand', PointStamped, queue_size=10)
 		self.elbow_pub = rospy.Publisher('mimic_elbow', PointStamped, queue_size=10)
+
+		self.move_queue = MoveQueue()
+		self.fails = 0
 		# self.arm_group.set_path_constraints(shoulder_constraint(self.arm_group))
 
 
@@ -123,7 +145,6 @@ class MessageCommander:
 		ppose.pose.orientation.w = pose[6]
 		self.pose_pub.publish(ppose)
 
-
 	def move_gripper(self, state):
 		self.gripper_group.clear_pose_targets()
 		group_variable_values = [state]*3
@@ -139,7 +160,8 @@ class MessageCommander:
 			raise BadArmException(arm_coord)
 
 		# arm_coord_ = np.copy(arm_coord)
-		# arm_coord[1,1:] = arm_coord[1,1:] - arm_coord[1,1] + BASE_HEIGHT
+		arm_coord[1,1:] = arm_coord[1,1:] - arm_coord[1,1] + BASE_HEIGHT
+		arm_coord[2,1:] = arm_coord[2,1:] - 0.2
 		arm_l = np.sum([np.linalg.norm(arm_coord[:,i]-arm_coord[:,i+1]) for i in range(len(arm_coord[0])-1)])
 		arm_coord = arm_coord / arm_l * K_REACH
 
@@ -148,9 +170,9 @@ class MessageCommander:
 
 		# angle
 		orient = None
-		if (arm_coord[1,-1] < LOW_REACH) or (np.linalg.norm(arm_coord[:,0]-arm_coord[:,-1]) < MAX_DIST):
+		if (np.linalg.norm(arm_coord[:,0]-arm_coord[:,-1]) < MAX_DIST):
 			orient = tf.quaternion_about_axis(np.pi, [1,0,0])
-			print 'using virtical pose'
+		# 	print 'using virtical pose'
 		else:
 			orient = get_quad(arm_coord[:,-1], arm_coord[:,-2], ARM_INIT_POSE)
 		# self.arm_group.set_path_constraints(end_effector_orientation_constraint(self.arm_group, orient))
@@ -163,20 +185,77 @@ class MessageCommander:
 	def set_message(self, arm_coord, hand_coord=None):
 		new_pose, elbow = self.format_message(arm_coord)
 		self.publish_pose(new_pose)
-		if (len(self.prev_pose) == 0) or (np.linalg.norm(self.prev_pose - new_pose) > MIN_DIFF):
-			self.publish_elbow(elbow)
-			self.publish_hand(new_pose[:3])
-			self.send(new_pose)
+		# if (len(self.prev_pose) == 0) or (diff > MIN_DIFF):
+		self.arm_group.clear_path_constraints()
+		if len(self.prev_pose) != 0:
+			diff = np.linalg.norm(self.prev_pose - new_pose)
+			if diff < MIN_DIFF:
+				return
+			# if diff < 0.4:
+			if self.fails < 5:
+				self.arm_group.set_path_constraints(joint_position_constraint(self.arm_group, new_pose))
+			# elif diff > 0.4:
+			else:
+				self.move_queue.record()
+		# 	self.arm_group.set_path_constraints(end_effector_orientation_constraint(self.arm_group, new_pose[3:]))
 
-	def send(self, pose):
-		# print pose
-		# for i in range(RAND_POSE_N):
+		# print self.arm_group.get_path_constraints()
+		self.publish_elbow(elbow)
+		self.publish_hand(new_pose[:3])
+		self.send(new_pose, arm_coord)
+
+	# def send_sequence(self):
+	# 	self.prev_pose == 0
+	# 	self.arm_group.clear_path_constraints()
+	# 	move_queue, n, _= self.move_queue.get()
+	# 	for i in range(n):
+	# 		if plan_and_move(self.arm_group, move_queue[i]['r']):
+	# 			print 'success'
+	# 		else:
+	# 			print 'failed'
+		# targets = np.zeros((n+1,7))
+		# targets[1:] = [move_queue[i]['r'] for i in range(n)]
+		# targets[0] = targets[-1:]
+		# print targets
+		# self.arm_group.set_pose_targets(targets.tolist())
+		# try:
+		# 	plan = self.arm_group.plan()
+		# 	return self.arm_group.execute(plan)
+		# except (moveit_commander.exception.MoveItCommanderException):
+		# 	return False
+
+		# waypoints = [None]*(n)
+		# waypoints[0] = self.arm_group.get_current_pose().pose
+		# for i in range(1,n):
+		# 	waypoints[i] = Pose()
+		# 	waypoints[i].position.x = move_queue[i]['r'][0]
+		# 	waypoints[i].position.y = move_queue[i]['r'][1]
+		# 	waypoints[i].position.z = move_queue[i]['r'][2]
+		# 	waypoints[i].orientation.x = move_queue[i]['r'][3]
+		# 	waypoints[i].orientation.y = move_queue[i]['r'][4]
+		# 	waypoints[i].orientation.z = move_queue[i]['r'][5]
+		# 	waypoints[i].orientation.w = move_queue[i]['r'][6]
+
+		# (plan, fraction) = self.arm_group.compute_cartesian_path(waypoints, 0.01, 0.0)
+		# if fraction == 1.0:
+		# 	self.arm_group.execute(plan)
+		# else:
+		# 	raise BadArmException(move_queue)
+
+	def send(self, pose, h_pose):
+		# self.prev_pose = pose
 		current_joint_val = np.array(self.arm_group.get_current_joint_values())
 		if plan_and_move(self.arm_group, pose.tolist(), False):
 			diff = current_joint_val - np.array(self.arm_group.get_current_joint_values())
 			print np.max(diff), np.average(diff)
 			self.prev_pose = pose
+
+			self.move_queue.push(self.arm_group.get_current_joint_values(), h_pose.tolist())
+			self.move_queue.record(True)
+				# self.send_sequence()
+			self.fails = 0
 			return
 			# plan_and_move(self.arm_group, self.arm_group.get_random_pose(), False)
 
+		self.fails += 1
 		raise BadArmException(pose)
